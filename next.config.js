@@ -11,14 +11,6 @@ const nextConfig = {
       },
     ],
   },
-  async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        destination: 'http://api-50tkak3xvgkgqxw7ypy6s3jt-20261113T234129:8080/:path*',
-      },
-    ];
-  },
 };
 
 module.exports = nextConfig;
