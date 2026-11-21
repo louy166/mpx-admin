@@ -1,4 +1,5 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://31.97.69.178:8082';
+const BACKEND_URL = 'http://31.97.69.178:8082';
+const API_BASE = '/api';
 
 class ApiService {
   constructor() {
@@ -77,10 +78,10 @@ class ApiService {
   resolveFileUrl(url) {
     if (!url) return null;
     if (url.startsWith('http://localhost:8080')) {
-      return url.replace('http://localhost:8080', API_BASE);
+      return url.replace('http://localhost:8080', BACKEND_URL);
     }
     if (url.startsWith('/uploads/')) {
-      return `${API_BASE}${url}`;
+      return `${BACKEND_URL}${url}`;
     }
     return url;
   }
@@ -165,4 +166,4 @@ class ApiService {
 
 const api = new ApiService();
 export default api;
-export { API_BASE };
+export { BACKEND_URL as API_BASE };
