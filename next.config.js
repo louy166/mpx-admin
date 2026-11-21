@@ -15,7 +15,7 @@ const nextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: 'http://31.97.69.178:8082/:path*',
+        destination: 'http://api-50tkak3xvgkgqxw7ypy6s3jt-20261113T234129:8080/:path*',
       },
     ];
   },
