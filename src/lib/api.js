@@ -1,6 +1,5 @@
 const BACKEND_URL = 'http://31.97.69.178:8082';
-const API_BASE = BACKEND_URL;
-
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || BACKEND_URL;
 class ApiService {
   constructor() {
     this.accessToken = null;
