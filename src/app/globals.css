@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    font-family: 'IBM Plex Sans Arabic', sans-serif;
+    @apply text-gray-900 bg-white;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Space Grotesk', sans-serif;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary text-white px-6 py-3 rounded-xl font-display font-semibold
+           hover:bg-primary-light transition-all duration-200 shadow-sm hover:shadow-md;
+  }
+  .btn-secondary {
+    @apply bg-white text-primary border-2 border-primary px-6 py-3 rounded-xl font-display font-semibold
+           hover:bg-primary-50 transition-all duration-200;
+  }
+  .btn-gold {
+    @apply bg-gold text-primary-dark px-6 py-3 rounded-xl font-display font-semibold
+           hover:bg-gold-light transition-all duration-200 shadow-sm;
+  }
+  .card {
+    @apply bg-white rounded-2xl border border-border shadow-sm hover:shadow-md transition-shadow duration-200;
+  }
+  .input-field {
+    @apply w-full px-4 py-3 rounded-xl border border-border bg-white text-gray-900
+           focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200
+           placeholder:text-gray-400;
+  }
+  .admin-card {
+    @apply bg-white rounded-xl border border-gray-200 p-6 shadow-sm;
+  }
+}
