@@ -1,5 +1,5 @@
 const BACKEND_URL = 'http://31.97.69.178:8082';
-const API_BASE = '/api';
+const API_BASE = BACKEND_URL;
 
 class ApiService {
   constructor() {
