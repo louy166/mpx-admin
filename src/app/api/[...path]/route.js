@@ -1,4 +1,4 @@
-const BACKEND = process.env.BACKEND_URL || 'http://31.97.69.178:8082';
+const BACKEND = 'http://172.16.1.1:8082';
 
 async function handler(req, { params }) {
     const { path } = await params;
