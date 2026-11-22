@@ -11,7 +11,7 @@ const pool = new Pool({
 export async function GET() {
   try {
     const [props, users, kyc] = await Promise.all([
-      pool.query('SELECT COUNT(*) FROM propriete'),
+      pool.query('SELECT COUNT(*) FROM bien'),
       pool.query('SELECT COUNT(*) FROM utilisateur'),
       pool.query("SELECT COUNT(*) FROM utilisateur WHERE kyc_verifie = false"),
     ]);

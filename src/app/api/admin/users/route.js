@@ -39,9 +39,9 @@ export async function GET(req) {
     const offset = page * size;
     const dataParams = [...params, size, offset];
     const dataResult = await pool.query(
-      `SELECT id, telephone, nom, prenom, email, role, photo_url, nni, kyc_verifie, date_inscription, derniere_connexion, plan, langue
+      `SELECT id, telephone, nom, prenom, email, role, photo_url, nni, kyc_verifie, cree_le, dernier_acces, plan, langue, statut_kyc
        FROM utilisateur ${where}
-       ORDER BY date_inscription DESC
+       ORDER BY cree_le DESC
        LIMIT $${dataParams.length - 1} OFFSET $${dataParams.length}`,
       dataParams
     );
