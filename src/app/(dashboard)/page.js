@@ -1,6 +1,6 @@
 ﻿'use client';
 import { useState, useEffect } from 'react';
-import { HiOutlineOfficeBuilding, HiOutlineUsers, HiOutlineEye, HiOutlineClipboardList } from 'react-icons/hi';
+import { HiOutlineOfficeBuilding, HiOutlineUsers, HiOutlineShieldCheck, HiOutlineCurrencyDollar } from 'react-icons/hi';
 import api from '@/lib/api';
 
 function StatCard({ icon: Icon, label, value, color }) {
@@ -18,31 +18,26 @@ function StatCard({ icon: Icon, label, value, color }) {
 }
 
 export default function DashboardPage() {
-  const [properties, setProperties] = useState([]);
-  const [totalProps, setTotalProps] = useState(0);
-  const [user, setUser] = useState(null);
+  const [stats, setStats] = useState(null);
+  const [recentProps, setRecentProps] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
       try {
-        const [propsRes, userRes] = await Promise.all([
+        const [statsRes, propsRes] = await Promise.all([
+          api.getStats().catch(() => null),
           api.getProperties({ page: 1, per_page: 5 }).catch(() => null),
-          api.getMe().catch(() => null),
         ]);
+        if (statsRes) setStats(statsRes);
         if (propsRes) {
-          setProperties(propsRes.data || []);
-          setTotalProps(propsRes.total || 0);
+          setRecentProps(propsRes.data || []);
         }
-        if (userRes) setUser(userRes);
       } catch {}
       setLoading(false);
     }
     load();
   }, []);
-
-  const totalVues = properties.reduce((sum, p) => sum + (p.nombre_vues || 0), 0);
-  const publies = properties.filter(p => p.status === 'publie').length;
 
   return (
     <div>
@@ -52,37 +47,17 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <StatCard
-          icon={HiOutlineOfficeBuilding}
-          label="Biens totaux"
-          value={totalProps}
-          color="bg-primary"
-        />
-        <StatCard
-          icon={HiOutlineClipboardList}
-          label="Biens publies"
-          value={publies}
-          color="bg-green-600"
-        />
-        <StatCard
-          icon={HiOutlineEye}
-          label="Vues totales"
-          value={totalVues}
-          color="bg-blue-500"
-        />
-        <StatCard
-          icon={HiOutlineUsers}
-          label="Mon compte"
-          value={user ? `${user.prenom} ${user.nom}` : '...'}
-          color="bg-amber-500"
-        />
+        <StatCard icon={HiOutlineOfficeBuilding} label="Biens totaux" value={stats?.total_properties ?? '...'} color="bg-primary" />
+        <StatCard icon={HiOutlineUsers} label="Utilisateurs" value={stats?.total_users ?? '...'} color="bg-blue-500" />
+        <StatCard icon={HiOutlineShieldCheck} label="KYC en attente" value={stats?.pending_kyc ?? '...'} color="bg-amber-500" />
+        <StatCard icon={HiOutlineCurrencyDollar} label="Revenus (MRU)" value={stats?.total_revenue ? Number(stats.total_revenue).toLocaleString() : '0'} color="bg-green-600" />
       </div>
 
       <div className="admin-card">
         <h2 className="font-display font-semibold text-lg text-gray-900 mb-4">Biens recents</h2>
         {loading ? (
           <p className="text-gray-400 py-4">Chargement...</p>
-        ) : properties.length > 0 ? (
+        ) : recentProps.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -95,7 +70,7 @@ export default function DashboardPage() {
                 </tr>
               </thead>
               <tbody>
-                {properties.map(p => (
+                {recentProps.map(p => (
                   <tr key={p.id} className="border-b border-gray-50 hover:bg-gray-50/50">
                     <td className="py-3 px-2 font-medium text-gray-900">{p.titre}</td>
                     <td className="py-3 px-2 text-gray-500">{p.ville}</td>

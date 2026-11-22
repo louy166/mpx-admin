@@ -146,6 +146,22 @@ class ApiService {
     });
   }
 
+  // Admin (direct DB via Next.js API routes)
+  getUsers(params = {}) {
+    const q = new URLSearchParams(params).toString();
+    return this.localRequest(`/api/admin/users${q ? '?' + q : ''}`);
+  }
+
+  getStats() {
+    return this.localRequest('/api/admin/stats');
+  }
+
+  async localRequest(path) {
+    const res = await fetch(path);
+    if (!res.ok) throw new Error(await res.text());
+    return res.json();
+  }
+
   // Plans
   getPlans() {
     return this.request('/plans');
