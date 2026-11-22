@@ -1,4 +1,4 @@
-const BACKEND_URL = 'http://31.97.69.178:8082';
+﻿const BACKEND_URL = 'http://31.97.69.178:8082';
 const API_BASE = typeof window !== 'undefined' && window.location.hostname !== 'localhost'
     ? '/api'
     : BACKEND_URL;
@@ -31,13 +31,13 @@ class ApiService {
   }
 
   async request(path, options = {}) {
-    const url = `${API_BASE}${path}`;
+    const url = ${API_BASE};
     const headers = {
       'Content-Type': 'application/json',
       ...options.headers,
     };
     if (this.accessToken) {
-      headers['Authorization'] = `Bearer ${this.accessToken}`;
+      headers['Authorization'] = Bearer ;
     }
 
     const res = await fetch(url, { ...options, headers });
@@ -45,7 +45,7 @@ class ApiService {
     if (res.status === 401 && this.refreshToken) {
       const refreshed = await this.doRefresh();
       if (refreshed) {
-        headers['Authorization'] = `Bearer ${this.accessToken}`;
+        headers['Authorization'] = Bearer ;
         const retry = await fetch(url, { ...options, headers });
         if (!retry.ok) throw new Error(await retry.text());
         return retry.status === 204 ? null : retry.json();
@@ -54,14 +54,14 @@ class ApiService {
 
     if (!res.ok) {
       const text = await res.text();
-      throw new Error(text || `HTTP ${res.status}`);
+      throw new Error(text || HTTP );
     }
     return res.status === 204 ? null : res.json();
   }
 
   async doRefresh() {
     try {
-      const res = await fetch(`${API_BASE}/auth/refresh`, {
+      const res = await fetch(${API_BASE}/auth/refresh, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ refresh_token: this.refreshToken }),
@@ -82,7 +82,7 @@ class ApiService {
       return url.replace('http://localhost:8080', BACKEND_URL);
     }
     if (url.startsWith('/uploads/')) {
-      return `${BACKEND_URL}${url}`;
+      return ${BACKEND_URL};
     }
     return url;
   }
@@ -118,7 +118,7 @@ class ApiService {
   // Properties
   getProperties(params = {}) {
     const q = new URLSearchParams(params).toString();
-    return this.request(`/properties${q ? '?' + q : ''}`);
+    return this.request(/properties);
   }
 
   getFeaturedProperties() {
@@ -126,7 +126,7 @@ class ApiService {
   }
 
   getProperty(id) {
-    return this.request(`/properties/${id}`);
+    return this.request(/properties/);
   }
 
   createProperty(data) {
@@ -134,11 +134,11 @@ class ApiService {
   }
 
   updateProperty(id, data) {
-    return this.request(`/properties/${id}`, { method: 'PUT', body: JSON.stringify(data) });
+    return this.request(/properties/, { method: 'PUT', body: JSON.stringify(data) });
   }
 
   updatePropertyStatus(id, status) {
-    return this.request(`/properties/${id}/status`, {
+    return this.request(/properties//status, {
       method: 'PATCH',
       body: JSON.stringify({ statut: status }),
     });
@@ -147,7 +147,25 @@ class ApiService {
   // Admin-specific
   getAllUsers(params = {}) {
     const q = new URLSearchParams(params).toString();
-    return this.request(`/users${q ? '?' + q : ''}`);
+    return this.request(/users);
+  }
+
+  getUsers(params = {}) {
+    return this.getAllUsers(params);
+  }
+
+  updateUserRole(userId, role) {
+    return this.request(/users//role, {
+      method: 'PATCH',
+      body: JSON.stringify({ role }),
+    });
+  }
+
+  toggleUserActive(userId, active) {
+    return this.request(/users//active, {
+      method: 'PATCH',
+      body: JSON.stringify({ active }),
+    });
   }
 
   getStats() {
@@ -161,7 +179,7 @@ class ApiService {
   // Notifications
   getNotifications(params = {}) {
     const q = new URLSearchParams(params).toString();
-    return this.request(`/notifications${q ? '?' + q : ''}`);
+    return this.request(/notifications);
   }
 }
 
