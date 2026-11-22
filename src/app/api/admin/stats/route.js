@@ -1,5 +1,7 @@
 ﻿import { Pool } from 'pg';
 
+export const dynamic = 'force-dynamic';
+
 const pool = new Pool({
   host: '172.16.1.1',
   port: 5432,
