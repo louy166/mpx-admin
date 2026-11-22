@@ -1,6 +1,6 @@
-'use client';
+﻿'use client';
 import { useState, useEffect } from 'react';
-import { HiOutlineOfficeBuilding, HiOutlineUsers, HiOutlineShieldCheck, HiOutlineCurrencyDollar } from 'react-icons/hi';
+import { HiOutlineOfficeBuilding, HiOutlineUsers, HiOutlineEye, HiOutlineClipboardList } from 'react-icons/hi';
 import api from '@/lib/api';
 
 function StatCard({ icon: Icon, label, value, color }) {
@@ -18,27 +18,31 @@ function StatCard({ icon: Icon, label, value, color }) {
 }
 
 export default function DashboardPage() {
-  const [stats, setStats] = useState(null);
-  const [recentProps, setRecentProps] = useState([]);
+  const [properties, setProperties] = useState([]);
+  const [totalProps, setTotalProps] = useState(0);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
       try {
-        const [statsRes, propsRes] = await Promise.all([
-          api.getStats().catch(() => null),
-          api.getProperties({ page: 0, size: 5 }).catch(() => null),
+        const [propsRes, userRes] = await Promise.all([
+          api.getProperties({ page: 1, per_page: 5 }).catch(() => null),
+          api.getMe().catch(() => null),
         ]);
-        if (statsRes) setStats(statsRes);
         if (propsRes) {
-          const list = propsRes.data || propsRes.content || [];
-          setRecentProps(list);
+          setProperties(propsRes.data || []);
+          setTotalProps(propsRes.total || 0);
         }
+        if (userRes) setUser(userRes);
       } catch {}
       setLoading(false);
     }
     load();
   }, []);
+
+  const totalVues = properties.reduce((sum, p) => sum + (p.nombre_vues || 0), 0);
+  const publies = properties.filter(p => p.status === 'publie').length;
 
   return (
     <div>
@@ -51,34 +55,34 @@ export default function DashboardPage() {
         <StatCard
           icon={HiOutlineOfficeBuilding}
           label="Biens totaux"
-          value={stats?.total_properties ?? '—'}
+          value={totalProps}
           color="bg-primary"
         />
         <StatCard
-          icon={HiOutlineUsers}
-          label="Utilisateurs"
-          value={stats?.total_users ?? '—'}
+          icon={HiOutlineClipboardList}
+          label="Biens publies"
+          value={publies}
+          color="bg-green-600"
+        />
+        <StatCard
+          icon={HiOutlineEye}
+          label="Vues totales"
+          value={totalVues}
           color="bg-blue-500"
         />
         <StatCard
-          icon={HiOutlineShieldCheck}
-          label="KYC en attente"
-          value={stats?.pending_kyc ?? '—'}
+          icon={HiOutlineUsers}
+          label="Mon compte"
+          value={user ? `${user.prenom} ${user.nom}` : '...'}
           color="bg-amber-500"
-        />
-        <StatCard
-          icon={HiOutlineCurrencyDollar}
-          label="Revenus (MRU)"
-          value={stats?.total_revenue ? Number(stats.total_revenue).toLocaleString() : '—'}
-          color="bg-green-600"
         />
       </div>
 
       <div className="admin-card">
-        <h2 className="font-display font-semibold text-lg text-gray-900 mb-4">Biens récents</h2>
+        <h2 className="font-display font-semibold text-lg text-gray-900 mb-4">Biens recents</h2>
         {loading ? (
           <p className="text-gray-400 py-4">Chargement...</p>
-        ) : recentProps.length > 0 ? (
+        ) : properties.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -91,19 +95,19 @@ export default function DashboardPage() {
                 </tr>
               </thead>
               <tbody>
-                {recentProps.map(p => (
+                {properties.map(p => (
                   <tr key={p.id} className="border-b border-gray-50 hover:bg-gray-50/50">
                     <td className="py-3 px-2 font-medium text-gray-900">{p.titre}</td>
                     <td className="py-3 px-2 text-gray-500">{p.ville}</td>
                     <td className="py-3 px-2 text-gray-500">{p.type}</td>
                     <td className="py-3 px-2">
                       <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                        p.statut === 'publie' ? 'bg-green-100 text-green-700'
-                          : p.statut === 'brouillon' ? 'bg-gray-100 text-gray-600'
-                          : p.statut === 'en_verification' ? 'bg-amber-100 text-amber-700'
+                        p.status === 'publie' ? 'bg-green-100 text-green-700'
+                          : p.status === 'brouillon' ? 'bg-gray-100 text-gray-600'
+                          : p.status === 'en_verification' ? 'bg-amber-100 text-amber-700'
                           : 'bg-red-100 text-red-600'
                       }`}>
-                        {p.statut}
+                        {p.status}
                       </span>
                     </td>
                     <td className="py-3 px-2 text-right font-medium">{Number(p.prix || 0).toLocaleString()} MRU</td>

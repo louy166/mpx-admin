@@ -117,8 +117,10 @@ class ApiService {
 
   // Properties
   getProperties(params = {}) {
-    const q = new URLSearchParams(params).toString();
-    return this.request(`/properties${q ? '?' + q : ''}`);
+    const p = { page: params.page || 1, per_page: params.per_page || params.size || 20 };
+    if (params.status) p.status = params.status;
+    const q = new URLSearchParams(p).toString();
+    return this.request(`/properties?${q}`);
   }
 
   getFeaturedProperties() {
@@ -140,46 +142,21 @@ class ApiService {
   updatePropertyStatus(id, status) {
     return this.request(`/properties/${id}/status`, {
       method: 'PATCH',
-      body: JSON.stringify({ statut: status }),
+      body: JSON.stringify({ status }),
     });
   }
 
-  // Admin-specific
-  getAllUsers(params = {}) {
-    const q = new URLSearchParams(params).toString();
-    return this.request(`/users${q ? '?' + q : ''}`);
-  }
-
-  getUsers(params = {}) {
-    return this.getAllUsers(params);
-  }
-
-  updateUserRole(userId, role) {
-    return this.request(`/users/${userId}/role`, {
-      method: 'PATCH',
-      body: JSON.stringify({ role }),
-    });
-  }
-
-  toggleUserActive(userId, active) {
-    return this.request(`/users/${userId}/active`, {
-      method: 'PATCH',
-      body: JSON.stringify({ active }),
-    });
-  }
-
-  getStats() {
-    return this.request('/admin/stats');
-  }
-
+  // Plans
   getPlans() {
     return this.request('/plans');
   }
 
   // Notifications
   getNotifications(params = {}) {
-    const q = new URLSearchParams(params).toString();
-    return this.request(`/notifications${q ? '?' + q : ''}`);
+    const p = { page: params.page || 1, per_page: params.per_page || 20 };
+    if (params.lu !== undefined) p.lu = params.lu;
+    const q = new URLSearchParams(p).toString();
+    return this.request(`/notifications?${q}`);
   }
 }
 
