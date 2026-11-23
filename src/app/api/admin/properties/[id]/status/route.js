@@ -15,7 +15,7 @@ export async function PATCH(req, { params }) {
     if (!['brouillon','en_verification','publie','rejete'].includes(newStatus)) {
       return Response.json({ error: 'Statut invalide' }, { status: 400 });
     }
-    await pool.query('UPDATE bien SET statut = , date_modification = NOW() WHERE id = ', [newStatus, id]);
+    await pool.query('UPDATE bien SET statut = $1, maj_le = NOW() WHERE id = $2', [newStatus, id]);
     return Response.json({ success: true, status: newStatus });
   } catch (err) {
     console.error('DB error:', err);
