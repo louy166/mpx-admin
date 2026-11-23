@@ -1,0 +1,33 @@
+import { Pool } from 'pg';
+export const dynamic = 'force-dynamic';
+const pool = new Pool({
+  host: process.env.DB_HOST || '172.16.1.1',
+  port: parseInt(process.env.DB_PORT || '5432'),
+  database: process.env.DB_NAME || 'foncier_api',
+  user: process.env.DB_USER || 'postgres',
+  password: process.env.DB_PASS || 'mpx_secret_2026',
+});
+export async function GET(req) {
+  try {
+    const url = new URL(req.url);
+    const page = parseInt(url.searchParams.get('page') || '1');
+    const perPage = parseInt(url.searchParams.get('per_page') || '20');
+    const status = url.searchParams.get('status') || '';
+    const search = url.searchParams.get('q') || '';
+    const offset = (page - 1) * perPage;
+    let where = [], params = [], idx = 1;
+    if (status) { where.push('b.statut = $' + idx); params.push(status); idx++; }
+    if (search) { where.push('(b.titre ILIKE $' + idx + ' OR b.ville ILIKE $' + idx + ')'); params.push('%' + search + '%'); idx++; }
+    const wc = where.length > 0 ? 'WHERE ' + where.join(' AND ') : '';
+    const countR = await pool.query('SELECT COUNT(*) FROM bien b ' + wc, params);
+    const total = parseInt(countR.rows[0].count);
+    const q = 'SELECT b.id, b.reference, b.titre, b.description_fr, b.type, b.statut as status, b.transaction, b.prix, b.devise, b.superficie_m2, b.nb_pieces, b.adresse, b.ville, b.quartier_nom, b.cree_le, b.maj_le, u.prenom as prop_prenom, u.nom as prop_nom FROM bien b LEFT JOIN utilisateur u ON b.proprietaire_id = u.id ' + wc + ' ORDER BY b.cree_le DESC LIMIT $' + idx + ' OFFSET $' + (idx + 1);
+    params.push(perPage, offset);
+    const dataR = await pool.query(q, params);
+    const data = dataR.rows.map(r => ({ id: r.id, reference: r.reference, titre: r.titre, description: r.description_fr, type: r.type, status: r.status, transaction: r.transaction, prix: parseFloat(r.prix), devise: r.devise || 'MRU', surface_m2: r.superficie_m2 ? parseFloat(r.superficie_m2) : null, nombre_pieces: r.nb_pieces, adresse: r.adresse, ville: r.ville, quartier: r.quartier_nom, proprietaire: r.prop_prenom || r.prop_nom ? { prenom: r.prop_prenom, nom: r.prop_nom } : null, date_creation: r.cree_le, date_modification: r.maj_le }));
+    return Response.json({ data, total, page, per_page: perPage, total_pages: Math.ceil(total / perPage) });
+  } catch (err) {
+    console.error('DB error:', err);
+    return Response.json({ error: err.message }, { status: 500 });
+  }
+}

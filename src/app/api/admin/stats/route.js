@@ -1,9 +1,9 @@
-﻿import { Pool } from 'pg';
+import { Pool } from 'pg';
 
 export const dynamic = 'force-dynamic';
 
 const pool = new Pool({
-  host: '172.16.1.1',
+  host: process.env.DB_HOST || '172.16.1.1',
   port: 5432,
   database: 'foncier_api',
   user: 'postgres',

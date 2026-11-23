@@ -1,0 +1,10 @@
+const fs = require('fs');
+const path = require('path');
+const propsDir = path.join('src','app','api','admin','properties');
+fs.mkdirSync(propsDir, { recursive: true });
+fs.writeFileSync(path.join(propsDir, 'route.js'), fs.readFileSync('route-props.tmp','utf8'));
+const statusDir = path.join(propsDir, '[id]', 'status');
+fs.mkdirSync(statusDir, { recursive: true });
+fs.writeFileSync(path.join(statusDir, 'route.js'), fs.readFileSync('route-status.tmp','utf8'));
+fs.writeFileSync(path.join('src','app','(dashboard)','properties','page.js'), fs.readFileSync('page-props.tmp','utf8'));
+console.log('Done!');
